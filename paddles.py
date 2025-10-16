@@ -12,7 +12,7 @@ class Paddle:
     def update_rect(self):
         self.rect.x = int(self.pos.x)
         self.rect.y = int(self.pos.y)
-        self.rect.height = self.rect.height
+        self.rect.height = self.size
         
     def draw(self,surface:pg.Surface) -> None:
         self.update_rect()
@@ -48,9 +48,13 @@ class ComputerPaddle(Paddle):
     def __init__(self, pos:pg.Vector2, speed:int, size:int):
         super().__init__(pos, speed, size)
     
-    def move(self, ball:Ball):
-        y_dist = ball.rect.y - self.rect.y
-        if abs(y_dist) < self.speed:
-            self.rect.y = int(ball.pos.y)
+    def move(self, ball:Ball): 
+        self.pos.y = ball.pos.y - self.size/2
+
+        
+        
+            
+        
+        
         
         

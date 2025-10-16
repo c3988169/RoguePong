@@ -1,0 +1,4 @@
+import pygame as pg
+
+PLAYER_LOSS_EVENT = pg.USEREVENT + 1
+OPEN_SHOP_EVENT = pg.USEREVENT + 2

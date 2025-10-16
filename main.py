@@ -1,7 +1,9 @@
 import pygame as pg
 import sys
-from paddles import PlayerPaddle
+from paddles import PlayerPaddle, ComputerPaddle
 from ball import Ball
+import events
+
 
 # Initialize pg
 pg.init()
@@ -10,6 +12,7 @@ pg.init()
 WIDTH, HEIGHT = 800, 600
 SCREEN = pg.display.set_mode((WIDTH, HEIGHT))
 pg.display.set_caption("Rogue Pong")
+
 
 CLOCK = pg.time.Clock()
 FPS = 60
@@ -33,31 +36,48 @@ BALL_STARTING_POS:pg.Vector2 = pg.Vector2(
     SCREEN.get_height()//2
 )
 BALL_STARTING_SPEED = 5
-BALL_STARTING_SIZE = 5
+BALL_STARTING_SIZE = 10
 GAME_BALL = Ball(BALL_STARTING_POS, BALL_STARTING_SPEED, BALL_STARTING_SIZE)
+
+COMPUTER_STARTING_POS = pg.Vector2(
+    SCREEN.get_width() - 20,
+    SCREEN.get_height() // 2
+)
+COMPUTER_STARTING_SPEED = 5
+COMPUTER_STARTING_SIZE = 50
+
+COMPUTER_PADDLE = ComputerPaddle(COMPUTER_STARTING_POS, COMPUTER_STARTING_SPEED, COMPUTER_STARTING_SIZE)
+
+trail_surface = pg.Surface((WIDTH, HEIGHT), pg.SRCALPHA)
+
+def fade_ball():
+    fade = pg.Surface((WIDTH, HEIGHT), pg.SRCALPHA)
+    fade.fill((0, 0, 0, 50))  # lower alpha = longer trail
+    trail_surface.blit(fade, (0, 0))
 
 # Game loop
 running = True
 while running:
-    # Event handling
     for event in pg.event.get():
         if event.type == pg.QUIT:
             running = False
 
-    # Game logic 
+    # Game logic
     PLAYER_PADDLE.move(SCREEN)
-    GAME_BALL.update_rect()
+    GAME_BALL.check_collisions(SCREEN, PLAYER_PADDLE, COMPUTER_PADDLE)
     GAME_BALL.move()
-    
+    COMPUTER_PADDLE.move(GAME_BALL)
+    COMPUTER_PADDLE.update_rect()
+
     # Drawing
-    SCREEN.fill(BLACK) 
+    fade_ball()
+    GAME_BALL.draw(trail_surface)
+    SCREEN.fill(BLACK)
+    SCREEN.blit(trail_surface, (0, 0))  # Add the faded trail layer
     PLAYER_PADDLE.draw(SCREEN)
-    GAME_BALL.draw(SCREEN)
+    COMPUTER_PADDLE.draw(SCREEN)
 
-    # Update the display
-    pg.display.flip()  # or pg.display.update()
-
-    # Control frame rate
+    pg.display.flip()
     CLOCK.tick(FPS)
 
 # Quit pg
